@@ -1,0 +1,8 @@
+[ebay-api]
+appid  = ""
+siteid = ""
+
+[general]
+seen_db_file       = "/tmp/ebaywatch"
+searchterms_file   = "/user/.ebaysearch"
+
