@@ -1,8 +1,10 @@
 [ebay-api]
 appid  = ""
+devid = ""
+certid = ""
 siteid = ""
 
 [general]
 seen_db_file       = "/tmp/ebaywatch"
-searchterms_file   = "/user/.ebaysearch"
+searchterms_file   = "/home/user/.ebaysearch"
 

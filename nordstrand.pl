@@ -33,13 +33,15 @@ END { untie %SEEN }
 #create Ebay API object
 my $call = eBay::API::Simple::Finding->new( 
   { 
-    appid =>  $config->param(-block=>'ebay-api')->{appid},
-    siteid => $config->param(-block=>'ebay-api')->{siteid} 
+   appid =>  $config->param(-block=>'ebay-api')->{appid},
+   devid => $config->param(-block=>'ebay-api')->{devid},
+   certid => $config->param(-block=>'ebay-api')->{certid},
+   siteid => $config->param(-block=>'ebay-api')->{siteid}
   }
 );
 
 
-my $cui = new Curses::UI( -color_support => 1 );
+my $cui = new Curses::UI( -color_support => 1, -mouse_support => 0 );
 my @menu = ( 
   { -label => 'File', 
     -submenu => [ { -label => 'Exit ^Q', -value => \&exit_dialog  },
@@ -205,7 +207,7 @@ sub fetch_ebay_data()
 
     if ( $call->has_error() )
     {
-      die "Call Failed:" . $call->errors_as_string();
+      die "Call Failed:" . $call->errors_as_string() . " " . $term;
     }
 
     # getters for the response Hash
