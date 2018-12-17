@@ -126,15 +126,19 @@ sub exit_dialog()
 #####################
 sub process_result {
 #####################
-  my($r) = @_;
+  my($r,$html) = @_;
   
   #print Dumper($r);
   #exit;
+
+
+
 
   #DEBUG "Result: ", $r->{'viewItemURL'},
     # " ", $r->{'title'},
     #" ", $r->{'itemId'},
     #" ", $r->{'sellingStatus'}->{'timeLeft'};
+
 
   # wenn wir das item schon in der DB haben, wollen wir nur den Preis aktualisieren
   if($SEEN{$r->{'itemId'}})
@@ -159,6 +163,8 @@ sub process_result {
   $title =encode($title);
   my $price = $r->{'sellingStatus'}->{'currentPrice'}->{'content'};
 
+  print $html "<a href=\"", $r->{'viewItemURL'}, "\"><img src=\"", $r->{'galleryURL'}, "\"></a>", $price, "&nbsp", $r->{'listingInfo'}->{'listingType'}, "<br>\n";	
+  
   # fixed price auctions should be shown in a different color
   if($r->{'listingInfo'}->{'listingType'} eq 'FixedPrice')
   {
@@ -166,7 +172,6 @@ sub process_result {
   } else {
     $msg = sprintf("%s|%s|%s| |N| |0",$title,$price,$endtimestring);
   }
-	
   #DEBUG $msg,"\n";
   $SEEN{$r->{'itemId'}} = $msg;
 }
@@ -188,6 +193,9 @@ sub fetch_ebay_data()
     -max => $numLines,
     -message => "Fetching Ebay Data...",
   );
+  
+  open (my $html, '>', 'ebaysearch.html');
+  print $html "<html><head></head><body>";
 
  #while(<FILE>)
   foreach(@lines)
@@ -213,19 +221,22 @@ sub fetch_ebay_data()
     # getters for the response Hash
     my $hash = $call->response_hash();
 
+
     # precess each search result
     # ATTENTION: when there is only oen single result, then a hash is resturned by the API instead of an array
     if ($hash->{'searchResult'}->{'count'} == 1)
     {
-      process_result($hash->{'searchResult'}->{'item'});
+      process_result($hash->{'searchResult'}->{'item'}, $html);
     } else {
       for my $result (@{$hash->{'searchResult'}->{'item'}})
       {
-        process_result($result);
+        process_result($result, $html);
       }
     }
+    
   }
-
+  print $html "</body></html>";
+  close $html;
   $cui->noprogress();  
 
   refresh_list();
